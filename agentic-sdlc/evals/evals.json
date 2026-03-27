@@ -1,0 +1,51 @@
+{
+  "skill_name": "agentic-sdlc",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have an idea for a SaaS product. It's basically a lightweight project status tool for small consulting firms — the kind where you have 5-10 client projects running at once and you need a way to quickly update clients on status without scheduling a call every time. Clients get a link, they see a simple dashboard with RAG status (red/amber/green), last update, and next milestone. Consultants update it in under 2 minutes. Nothing fancy. Help me figure out if this is worth building and what the real problem statement is.",
+      "expected_output": "Should produce problem-statement.md and opportunity-brief.md as real files. Problem statement must be one precise user-centric sentence. Opportunity brief must have all 6 required sections. Should not jump to tech stack or requirements.",
+      "files": [],
+      "assertions": [
+        {"text": "problem-statement.md is saved as a file (not just shown in conversation)"},
+        {"text": "opportunity-brief.md is saved as a file"},
+        {"text": "problem-statement.md contains a one-sentence problem statement in user-centric format (no solution language)"},
+        {"text": "opportunity-brief.md contains all 6 required sections: Problem, Why Now, Target User, Our Approach, Success Metrics, What We're NOT Building"},
+        {"text": "Response does not jump to requirements, features, or tech stack before completing Phase 1 artifacts"},
+        {"text": "Assumptions are explicitly listed (at least 3)"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to write tests for this API route handler. It's a POST /api/projects endpoint that creates a new project. [code provided] We use Jest + Supertest. Mock the db with jest.mock.",
+      "expected_output": "Should detect Phase 5 and produce a complete TypeScript test file covering: missing required fields, 404 for unknown client, unauthenticated request, happy path 201, ownerId defaulting. Test names in 'should X when Y' format.",
+      "files": [],
+      "assertions": [
+        {"text": "createProject.test.ts is saved as a file"},
+        {"text": "Tests cover missing 'name' field returning 400"},
+        {"text": "Tests cover missing 'clientId' field returning 400"},
+        {"text": "Tests cover client not found returning 404"},
+        {"text": "Tests cover unauthenticated request (no req.user)"},
+        {"text": "Tests cover happy path returning 201 with project object"},
+        {"text": "Tests cover ownerId defaulting to req.user.id when not provided"},
+        {"text": "At least one test uses 'should X when Y' naming pattern"},
+        {"text": "db is mocked using jest.mock (not a real database call)"}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We're getting a spike in 500 errors on our production API. Started about 20 minutes ago. About 8% of requests are failing. [logs showing Prisma cannot reach db.internal:5432] No deploys in last 6 hours. Added a read replica yesterday.",
+      "expected_output": "Should detect Phase 6 incident triage. Should not ask unnecessary questions. Should produce: root cause hypothesis (DB connectivity), ordered diagnostic steps, fastest mitigation, blast radius, concise non-technical internal update.",
+      "files": [],
+      "assertions": [
+        {"text": "incident-triage.md is saved as a file"},
+        {"text": "Identifies DB connectivity to db.internal:5432 as the primary root cause hypothesis"},
+        {"text": "Provides at least 3 ordered diagnostic steps"},
+        {"text": "Includes a fastest mitigation path (not just diagnosis)"},
+        {"text": "Addresses blast radius — who else might be affected"},
+        {"text": "Includes a non-technical internal status update of 3-4 sentences"},
+        {"text": "Mentions the read replica as a possible contributing factor or area to investigate"}
+      ]
+    }
+  ]
+}
