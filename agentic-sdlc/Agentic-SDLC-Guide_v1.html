@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic SDLC Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #07090f;
+    --surface:   #0d1118;
+    --surface2:  #111827;
+    --border:    #1c2540;
+    --border2:   #243056;
+    --text:      #c9d4ec;
+    --text-muted:#5e7094;
+    --text-dim:  #8495b8;
+
+    --amber:  #f59e0b;
+    --emerald:#10b981;
+    --blue:   #3b82f6;
+    --violet: #8b5cf6;
+    --rose:   #f43f5e;
+    --cyan:   #06b6d4;
+
+    --p1: var(--amber);
+    --p2: var(--emerald);
+    --p3: var(--blue);
+    --p4: var(--violet);
+    --p5: var(--rose);
+    --p6: var(--cyan);
+
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'Outfit', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+
+    --sidebar-w: 260px;
+    --radius: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── LAYOUT ─────────────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── TOPBAR ─────────────────────────────────────────── */
+  .topbar {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px 20px calc(var(--sidebar-w) + 40px);
+    display: flex;
+    align-items: flex-end;
+    gap: 40px;
+  }
+
+  .topbar-title {
+    flex-shrink: 0;
+  }
+
+  .topbar-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .topbar-title h1 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: #e8edf8;
+    letter-spacing: -.02em;
+  }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .pip-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .pip-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .pip-dot:hover { transform: scale(1.15); }
+
+  .pip-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pip-arrow {
+    margin: 0 6px;
+    color: var(--border2);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .pip-node:nth-child(1)  .pip-dot { border-color: var(--p1); color: var(--p1); }
+  .pip-node:nth-child(3)  .pip-dot { border-color: var(--p2); color: var(--p2); }
+  .pip-node:nth-child(5)  .pip-dot { border-color: var(--p3); color: var(--p3); }
+  .pip-node:nth-child(7)  .pip-dot { border-color: var(--p4); color: var(--p4); }
+  .pip-node:nth-child(9)  .pip-dot { border-color: var(--p5); color: var(--p5); }
+  .pip-node:nth-child(11) .pip-dot { border-color: var(--p6); color: var(--p6); }
+
+  .pip-node:nth-child(1)  .pip-label { color: var(--p1); }
+  .pip-node:nth-child(3)  .pip-label { color: var(--p2); }
+  .pip-node:nth-child(5)  .pip-label { color: var(--p3); }
+  .pip-node:nth-child(7)  .pip-label { color: var(--p4); }
+  .pip-node:nth-child(9)  .pip-label { color: var(--p5); }
+  .pip-node:nth-child(11) .pip-label { color: var(--p6); }
+
+  /* ─── SIDEBAR ────────────────────────────────────────── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+  }
+
+  .sidebar-section {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-section-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-left: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .12s;
+  }
+  .nav-item:hover { background: var(--surface2); }
+  .nav-item.active { background: var(--surface2); }
+
+  .nav-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    flex-shrink: 0;
+    transition: background .12s;
+  }
+
+  .nav-item:hover .nav-num,
+  .nav-item.active .nav-num {
+    background: currentColor;
+  }
+  .nav-item:hover .nav-num span,
+  .nav-item.active .nav-num span {
+    color: var(--bg);
+  }
+
+  .nav-num span {
+    line-height: 1;
+  }
+
+  .nav-label {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    transition: color .12s;
+  }
+  .nav-item:hover .nav-label,
+  .nav-item.active .nav-label {
+    color: var(--text);
+  }
+
+  .nav-item[data-phase="1"] .nav-num { border-color: var(--p1); color: var(--p1); }
+  .nav-item[data-phase="2"] .nav-num { border-color: var(--p2); color: var(--p2); }
+  .nav-item[data-phase="3"] .nav-num { border-color: var(--p3); color: var(--p3); }
+  .nav-item[data-phase="4"] .nav-num { border-color: var(--p4); color: var(--p4); }
+  .nav-item[data-phase="5"] .nav-num { border-color: var(--p5); color: var(--p5); }
+  .nav-item[data-phase="6"] .nav-num { border-color: var(--p6); color: var(--p6); }
+
+  .sidebar-footer {
+    padding: 20px 28px 0;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    line-height: 1.9;
+  }
+
+  /* ─── MAIN CONTENT ───────────────────────────────────── */
+  .main {
+    overflow-y: auto;
+    padding: 48px 56px 80px;
+  }
+
+  /* ─── PHASE SECTION ──────────────────────────────────── */
+  .phase {
+    margin-bottom: 88px;
+    scroll-margin-top: 40px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .phase-number-bg {
+    position: absolute;
+    right: 0;
+    top: -16px;
+    font-family: var(--font-display);
+    font-size: 120px;
+    font-weight: 800;
+    opacity: .04;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .phase-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phase-meta { position: relative; z-index: 1; }
+
+  .phase-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .phase-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    color: #e8edf8;
+    margin-bottom: 8px;
+  }
+
+  .phase-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 620px;
+    line-height: 1.6;
+  }
+
+  /* Phase color theming */
+  .phase-1 .phase-badge { border-color: var(--p1); color: var(--p1); }
+  .phase-1 .phase-tag   { color: var(--p1); }
+  .phase-1 .phase-number-bg { color: var(--p1); }
+  .phase-2 .phase-badge { border-color: var(--p2); color: var(--p2); }
+  .phase-2 .phase-tag   { color: var(--p2); }
+  .phase-2 .phase-number-bg { color: var(--p2); }
+  .phase-3 .phase-badge { border-color: var(--p3); color: var(--p3); }
+  .phase-3 .phase-tag   { color: var(--p3); }
+  .phase-3 .phase-number-bg { color: var(--p3); }
+  .phase-4 .phase-badge { border-color: var(--p4); color: var(--p4); }
+  .phase-4 .phase-tag   { color: var(--p4); }
+  .phase-4 .phase-number-bg { color: var(--p4); }
+  .phase-5 .phase-badge { border-color: var(--p5); color: var(--p5); }
+  .phase-5 .phase-tag   { color: var(--p5); }
+  .phase-5 .phase-number-bg { color: var(--p5); }
+  .phase-6 .phase-badge { border-color: var(--p6); color: var(--p6); }
+  .phase-6 .phase-tag   { color: var(--p6); }
+  .phase-6 .phase-number-bg { color: var(--p6); }
+
+  /* ─── 3-COL INFO GRID ────────────────────────────────── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+
+  .info-card-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .info-card-list {
+    list-style: none;
+  }
+  .info-card-list li {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 3px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+  }
+  .info-card-list li::before {
+    content: '—';
+    font-family: var(--font-mono);
+    color: var(--border2);
+    flex-shrink: 0;
+    line-height: 1.7;
+  }
+
+  .badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+  }
+
+  /* ─── PROMPT LIBRARY ─────────────────────────────────── */
+  .prompt-library-header {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prompt-library-header::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: .5;
+  }
+
+  .prompt-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color .15s;
+  }
+  .prompt-card:hover { border-color: var(--border2); }
+  .prompt-card.open  { border-color: var(--border2); }
+
+  .prompt-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .prompt-index {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    width: 22px;
+  }
+
+  .prompt-title-text {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .prompt-use-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .prompt-chevron {
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .prompt-card.open .prompt-chevron { transform: rotate(180deg); }
+
+  .prompt-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .prompt-card.open .prompt-body { display: block; }
+
+  .prompt-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.75;
+    color: #a8bbd4;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 20px 22px;
+    background: #080b12;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prompt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .copy-btn:hover { background: var(--border2); color: var(--text); }
+  .copy-btn.copied { color: #4ade80; border-color: #4ade80; }
+
+  /* ─── QUALITY GATE ───────────────────────────────────── */
+  .quality-gate {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .gate-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .gate-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .gate-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .gate-checklist {
+    list-style: none;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .gate-checklist li {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .gate-checklist li::before {
+    content: '□';
+    font-family: var(--font-mono);
+    color: var(--border2);
+    flex-shrink: 0;
+    line-height: 1.7;
+    font-size: 11px;
+  }
+
+  /* ─── SECTION DIVIDER ────────────────────────────────── */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* ─── FLEX CALLOUT ───────────────────────────────────── */
+  .flex-callout {
+    background: rgba(59, 130, 246, .06);
+    border: 1px solid rgba(59, 130, 246, .2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .flex-callout::before {
+    content: '⚙';
+    color: var(--blue);
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .flex-callout strong { color: var(--blue); font-weight: 600; }
+
+  /* ─── SCROLL APPEARANCE ──────────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a4d6a; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .topbar { padding-left: 24px; }
+    .main { padding: 32px 24px 64px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .pipeline { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <div class="topbar-eyebrow">SMALL TEAM · SAAS · GITHUB · CLOUD</div>
+      <h1>Agentic SDLC Guide</h1>
+    </div>
+    <nav class="pipeline" aria-label="Phase pipeline">
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-1').scrollIntoView({behavior:'smooth'})"><span>1</span></div>
+        <span class="pip-label">Ideation</span>
+      </div>
+      <span class="pip-arrow">›</span>
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-2').scrollIntoView({behavior:'smooth'})"><span>2</span></div>
+        <span class="pip-label">Requirements</span>
+      </div>
+      <span class="pip-arrow">›</span>
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-3').scrollIntoView({behavior:'smooth'})"><span>3</span></div>
+        <span class="pip-label">Architecture</span>
+      </div>
+      <span class="pip-arrow">›</span>
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-4').scrollIntoView({behavior:'smooth'})"><span>4</span></div>
+        <span class="pip-label">Development</span>
+      </div>
+      <span class="pip-arrow">›</span>
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-5').scrollIntoView({behavior:'smooth'})"><span>5</span></div>
+        <span class="pip-label">Testing</span>
+      </div>
+      <span class="pip-arrow">›</span>
+      <div class="pip-node">
+        <div class="pip-dot" onclick="document.getElementById('phase-6').scrollIntoView({behavior:'smooth'})"><span>6</span></div>
+        <span class="pip-label">Deploy &amp; Ops</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Phases</div>
+      <a class="nav-item" href="#phase-1" data-phase="1">
+        <div class="nav-num"><span>1</span></div>
+        <span class="nav-label">Ideation &amp; Discovery</span>
+      </a>
+      <a class="nav-item" href="#phase-2" data-phase="2">
+        <div class="nav-num"><span>2</span></div>
+        <span class="nav-label">Requirements</span>
+      </a>
+      <a class="nav-item" href="#phase-3" data-phase="3">
+        <div class="nav-num"><span>3</span></div>
+        <span class="nav-label">Architecture &amp; Design</span>
+      </a>
+      <a class="nav-item" href="#phase-4" data-phase="4">
+        <div class="nav-num"><span>4</span></div>
+        <span class="nav-label">Development</span>
+      </a>
+      <a class="nav-item" href="#phase-5" data-phase="5">
+        <div class="nav-num"><span>5</span></div>
+        <span class="nav-label">Testing &amp; QA</span>
+      </a>
+      <a class="nav-item" href="#phase-6" data-phase="6">
+        <div class="nav-num"><span>6</span></div>
+        <span class="nav-label">Deploy &amp; Ops</span>
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      Stack: GitHub + Cloud<br>
+      Team: 2–4 devs · AI-savvy<br>
+      Build: SaaS web apps<br>
+      Deploy: AWS / Azure / GCP<br>
+      <br>
+      ⚙ = Flex point (adapt freely)<br>
+      ▸ = Expand prompt
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 1: IDEATION & DISCOVERY
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-1" id="phase-1">
+      <div class="phase-header">
+        <div class="phase-badge">1</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 01 · Ideation &amp; Discovery</div>
+          <h2 class="phase-title">Ideation &amp; Discovery</h2>
+          <p class="phase-desc">Define the problem worth solving before a single line of code is written. This phase ends with a shared, documented understanding of the problem, the user, and the competitive landscape — and a team decision to proceed.</p>
+        </div>
+        <div class="phase-number-bg">1</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>Problem framing and user research</li>
+            <li>Competitive landscape review</li>
+            <li>Technical feasibility assessment</li>
+            <li>Go / no-go alignment on the opportunity</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">Problem decomposition</span>
+            <span class="badge">Competitor research</span>
+            <span class="badge">Assumption mapping</span>
+            <span class="badge">Feasibility analysis</span>
+            <span class="badge">Opportunity brief drafting</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>Problem statement (1-sentence)</li>
+            <li>Competitive landscape summary</li>
+            <li>Feasibility notes</li>
+            <li>Opportunity brief (1-pager)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;For pure internal tools or well-understood domains, compress this to a single opportunity brief. Reserve the full competitive analysis for externally-facing products where differentiation matters.
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P1.1</span>
+            <span class="prompt-title-text">Problem Framing</span>
+            <span class="prompt-use-tag">Before any scoping</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">I'm exploring a potential software product idea. Help me rigorously define the problem before I commit to building anything.
+
+Here's my rough idea: [DESCRIBE YOUR IDEA IN 2-3 SENTENCES]
+
+Work through this with me:
+
+1. Restate the problem in user-centric terms — not solution terms. Who experiences this problem? When? What do they currently do instead?
+
+2. Identify the core pain type:
+   - Frequency problem (happens constantly, low severity each time)
+   - Intensity problem (severe when it occurs, even if rare)
+   - Reach problem (affects a very large population)
+   Which type is this, and why does that matter for our product strategy?
+
+3. What assumptions am I making? List the top 5 assumptions this idea depends on being true. For each: what's the evidence it's true, and what would falsify it?
+
+4. What would make this problem NOT worth solving? Existing solutions that are "good enough," niche too small, regulatory barriers, technical impossibility — list the real reasons we might walk away.
+
+5. Give me a one-sentence problem statement in this format:
+   [User type] struggle to [do X] when [context/trigger], which causes [negative outcome].
+
+Be skeptical. Challenge my framing. I'd rather surface a flawed premise now than build the wrong product.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P1.2</span>
+            <span class="prompt-title-text">Competitive Landscape Analysis</span>
+            <span class="prompt-use-tag">Market research phase</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">I'm building [PRODUCT DESCRIPTION]. Before I finalize scope, help me map the competitive landscape thoroughly.
+
+Context:
+- Target user: [WHO THEY ARE AND WHAT THEY DO]
+- Core value we're trying to deliver: [1-2 SENTENCES]
+- Team size: 2-4 developers
+- Initial target market: [GEOGRAPHY / SEGMENT]
+
+Analyze:
+
+1. Direct competitors — products solving the same problem for the same user. For each:
+   - Product name and URL
+   - Core value proposition
+   - Pricing model
+   - Key strengths
+   - Known weaknesses or gaps users complain about (check G2, Reddit, App Store reviews)
+
+2. Indirect competitors — tools users currently cobble together (spreadsheets, manual processes, Notion, generic SaaS). Why do they settle for these?
+
+3. Emerging threats — any AI-native or recently funded entrants that could commoditize this space within 2 years. Be specific about capability gaps we'd be racing against.
+
+4. Differentiation opportunities — where are the genuine white spaces? What would make our product genuinely defensible rather than a feature-equivalent clone?
+
+5. Build vs. buy signal — are there open-source libraries, APIs, or existing SaaS building blocks that make part of this a solved problem? Should we build around them or compete with them?
+
+6. Positioning recommendation — given all of the above, suggest 1-2 positioning angles that would let a 2-4 person team compete without fighting the incumbents head-on.
+
+Be direct. If there's a well-funded competitor that already does this well, say so explicitly rather than softening it.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P1.3</span>
+            <span class="prompt-title-text">Technical Feasibility Assessment</span>
+            <span class="prompt-use-tag">Before committing to build</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">I want to assess the technical feasibility of this product concept before committing to build it.
+
+Product concept: [DESCRIBE IN DETAIL — core features, user interactions, data flows]
+Assumed tech stack: [e.g., React + TypeScript frontend, Node.js API, PostgreSQL, AWS]
+Team: 2-4 full-stack developers, comfortable with AI tooling, moderate cloud experience
+
+Evaluate:
+
+1. Complexity tiers — break the product into its core components and rate each:
+   Low / Medium / High complexity. Flag any "hard problems" explicitly:
+   - Real-time collaboration or sync
+   - ML/AI inference in the critical path
+   - Payment processing and financial compliance
+   - Complex search or recommendation
+   - Regulatory requirements (HIPAA, SOC 2, GDPR)
+   - High-cardinality data at scale
+
+2. Third-party dependencies — what APIs, platforms, or services does this rely on?
+   For each: reliability track record, pricing at scale, lock-in risk, alternatives.
+
+3. Time-to-MVP estimate — given a 2-4 person team working full-time, what's a realistic calendar range for a shippable MVP that could be user-tested? Give a range, not a point estimate, and explain the spread.
+
+4. Top 3 technical risks — what are the specific things most likely to blow up the timeline or force a pivot? For each: likelihood, impact, and mitigation.
+
+5. Proof-of-concept recommendation — what's the smallest technical spike (1-3 days) that would validate the riskiest assumption? What would a passing result look like vs. a result that should make us reconsider?
+
+Be direct. If there is a hard technical blocker or a dependency that makes the timeline unrealistic, say so explicitly. Optimistic feasibility assessments are the most expensive kind.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P1.4</span>
+            <span class="prompt-title-text">Opportunity Brief</span>
+            <span class="prompt-use-tag">Team alignment doc</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Based on our discovery work, help me write a 1-page opportunity brief to align the team before we move to requirements.
+
+Input context:
+- Problem statement: [PASTE YOUR PROBLEM STATEMENT]
+- Target user description: [DESCRIBE]
+- Competitive landscape summary: [PASTE OR SUMMARIZE KEY FINDINGS]
+- Our differentiation angle: [DESCRIBE]
+- Feasibility assessment summary: [PASTE KEY POINTS]
+
+Write the brief with these sections:
+
+1. The Problem (2-3 sentences, user-centric — no solution language)
+
+2. Why Now — what has changed in technology, market behavior, or infrastructure that makes this the right moment to build this? (Not just "the problem exists" — why is NOW the window?)
+
+3. Target User — a specific, representative user persona in 3-4 sentences. Name, role, context, and the specific moment this product would change their day.
+
+4. Our Approach — what we're building and why it's different. Not a feature list — a value narrative. What does a user feel or gain that they couldn't before?
+
+5. Success Metrics — how we'll know in 90 days if we're building the right thing. 2-3 specific, measurable signals (not vanity metrics).
+
+6. What We Are NOT Building — explicit scope boundaries. This section is as important as the rest. If it's not here, it's in scope.
+
+Constraints: direct tone, no marketing language, no fluff. This is for internal alignment, not external pitch. 350-450 words max. Our team reads this before the first requirements meeting.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — Exit Criteria</div>
+          <ul class="gate-checklist">
+            <li>Problem statement written and agreed on by the full team</li>
+            <li>At least one competitor reviewed in depth; differentiation angle defined</li>
+            <li>Feasibility assessment complete; no unresolved hard blockers</li>
+            <li>Opportunity brief reviewed and signed off by all decision-makers</li>
+            <li>Team has explicitly decided: build this, pivot the idea, or stop</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 2: REQUIREMENTS & SPECIFICATION
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-2" id="phase-2">
+      <div class="phase-header">
+        <div class="phase-badge">2</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 02 · Requirements &amp; Specification</div>
+          <h2 class="phase-title">Requirements &amp; Specification</h2>
+          <p class="phase-desc">Translate the opportunity brief into a precise, developer-ready specification. Every story should be independently implementable, testable, and scoped to a single behavior. Ambiguity at this stage is a debt that compounds in every phase that follows.</p>
+        </div>
+        <div class="phase-number-bg">2</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>PRD drafted and reviewed</li>
+            <li>User stories written per epic</li>
+            <li>Acceptance criteria written in BDD format</li>
+            <li>NFRs defined and agreed</li>
+            <li>Scope explicitly bounded</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">PRD drafting</span>
+            <span class="badge">Story generation</span>
+            <span class="badge">Acceptance criteria</span>
+            <span class="badge">NFR checklist</span>
+            <span class="badge">Scope prioritization</span>
+            <span class="badge">Ambiguity detection</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>Product Requirements Document (PRD)</li>
+            <li>Story map with acceptance criteria</li>
+            <li>Non-functional requirements checklist</li>
+            <li>Explicit out-of-scope list</li>
+            <li>Open questions log (with owners)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;On very small internal tools, a PRD can be a single GitHub Issue with acceptance criteria. The structure below is for anything customer-facing or with multiple contributors. Match formality to consequence.
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P2.1</span>
+            <span class="prompt-title-text">Full PRD Generation</span>
+            <span class="prompt-use-tag">First requirements pass</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Write a Product Requirements Document (PRD) for the following product.
+
+Opportunity brief: [PASTE YOUR OPPORTUNITY BRIEF]
+Team: 2-4 developers, full-stack, AI-tooling fluent
+Platform: SaaS web app, cloud-deployed (AWS/Azure/GCP)
+Timeline goal: MVP in [X weeks/months]
+
+Structure the PRD with:
+
+1. Overview
+   - Problem (1 paragraph, user-centric)
+   - Solution (1 paragraph — what we're building and the core value mechanism)
+   - Goals for MVP (3-5 bullet points — measurable outcomes, not features)
+
+2. User Personas (2-3)
+   For each: name, role, primary goal, key frustration this product resolves, and one representative scenario.
+
+3. User Stories — organized by epic
+   For each story: "As a [user], I want to [action] so that [outcome]."
+   Write at minimum 10-15 stories covering the complete core workflow.
+   Label each: [MUST / SHOULD / COULD] for MVP prioritization.
+
+4. Acceptance Criteria — BDD format for each story
+   Given [initial context] / When [action taken] / Then [expected outcome]
+   Include: happy path, empty/zero state, and at least one error case per story.
+
+5. Non-Functional Requirements
+   - Performance: page load target, API response time budget
+   - Security: auth standard, encryption requirements
+   - Accessibility: WCAG 2.1 AA minimum
+   - Browser support
+   - Uptime SLA
+
+6. Out of Scope — explicit list of things that are deliberately NOT in v1. If it's not here, it's implicitly in scope.
+
+7. Open Questions — table with: question, why it blocks progress, owner, and deadline.
+
+Flag any stories where a product decision is needed before development can start. Use markdown formatting. Be thorough — gaps in this document become rework in development.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P2.2</span>
+            <span class="prompt-title-text">Story Refinement &amp; Completeness Review</span>
+            <span class="prompt-use-tag">After first PRD draft</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Review these user stories and acceptance criteria for completeness, testability, and hidden risk.
+
+Stories: [PASTE YOUR STORIES AND ACCEPTANCE CRITERIA]
+
+For each story, evaluate:
+
+1. Value clarity — is the "so that [outcome]" specific and meaningful, or is it vague? Rewrite any that are generic ("so that I can use the product" is not a value statement).
+
+2. Testability — are the acceptance criteria specific enough that a developer and a QA engineer would independently write the same test? Rewrite any criteria that use vague language ("the page loads quickly," "the form works correctly").
+
+3. Missing scenarios — for each story, add Given/When/Then scenarios for:
+   - Empty state (no data, first-time user)
+   - Error state (failed validation, API failure, network error)
+   - Permission edge case (unauthorized user, wrong role)
+   - Concurrent or race condition case (if applicable)
+
+4. Complexity estimate — T-shirt size (S / M / L / XL) with a one-sentence rationale. Flag anything XL for breakdown into smaller stories.
+
+5. Hidden dependencies — are there stories that cannot be started until another story is complete? Map the dependency chain and flag sequencing constraints.
+
+6. Scope creep risk — which stories have a high likelihood of expanding mid-sprint? Flag them and recommend explicit scope guards in the acceptance criteria.
+
+Output format: revised stories with your changes marked [REVISED] and additions marked [ADDED]. End with a summary table: story ID, complexity, dependencies, risk flag (High/Medium/Low).</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P2.3</span>
+            <span class="prompt-title-text">Non-Functional Requirements Checklist</span>
+            <span class="prompt-use-tag">Before architecture begins</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Generate a comprehensive Non-Functional Requirements (NFR) specification for a SaaS web application.
+
+Product context: [DESCRIBE — what it does, who uses it, what data it handles]
+Expected users at launch: [e.g., &lt;100 internal / 500 early access]
+Expected users at scale: [e.g., 10,000 / 100,000]
+Data sensitivity: [e.g., PII only / financial data / health data / no sensitive data]
+Regulatory context: [e.g., GDPR-applicable / US only / HIPAA scope / none]
+
+Cover each NFR category with: Requirement / Rationale / How to Verify
+
+1. Performance
+   - Initial page load (LCP target)
+   - API response time (p50 and p99)
+   - Database query time budget
+   - Concurrent user handling target
+
+2. Scalability
+   - Expected load profile (read-heavy vs. write-heavy)
+   - Horizontal vs. vertical scaling strategy
+   - Stateless design requirement (for horizontal scaling)
+   - Cache strategy recommendation
+
+3. Security
+   - Authentication standard (recommend OIDC/OAuth2 — justify if deviating)
+   - Authorization model (RBAC / ABAC)
+   - Encryption: in transit (TLS 1.2+) and at rest
+   - Secrets management approach (no hardcoded secrets, rotation policy)
+   - Dependency vulnerability scanning (tool recommendation)
+   - OWASP Top 10 mitigations — list the top 5 most relevant to this product type
+
+4. Reliability
+   - Uptime SLA (and what "uptime" means for this product)
+   - Error rate budget
+   - RTO / RPO (if data loss is a concern)
+   - Graceful degradation requirements
+
+5. Observability
+   - Structured logging requirements
+   - Distributed tracing (if applicable)
+   - Key alerting thresholds (error rate, latency, disk, memory)
+   - Health check endpoint specification
+
+6. Accessibility
+   - WCAG 2.1 AA baseline
+   - Specific components most likely to have issues in this product type
+
+7. Developer Experience
+   - Local dev setup time target (e.g., &lt;30 minutes for a new engineer)
+   - CI pipeline time budget (e.g., &lt;10 minutes for full suite)
+   - Documentation coverage expectation</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P2.4</span>
+            <span class="prompt-title-text">MVP Scope Prioritization</span>
+            <span class="prompt-use-tag">When backlog is too large</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">My feature list is larger than our MVP timeline. Help me cut ruthlessly.
+
+Full feature list:
+[PASTE EVERY PROPOSED FEATURE OR USER STORY]
+
+Constraints:
+- Timeline: [X weeks] to a shippable, user-testable MVP
+- Team: 2-4 developers
+- Goal: something we can put in front of real users to generate validated learning
+
+For each feature, evaluate across four dimensions:
+1. Core necessity — can the product be meaningfully user-tested WITHOUT this? (Yes/No — no hedging)
+2. Build cost — rough estimate in developer-days
+3. Learning value — will this feature generate feedback that shapes future decisions?
+4. Deferral risk — does deferring this to v1.1 create technical debt or user confusion?
+
+Then sort into three tiers:
+
+TIER 1 — MVP Core
+These features must ship. Without them, the product can't be meaningfully evaluated by users. For each: why it's non-negotiable.
+
+TIER 2 — v1.1 (defer with low risk)
+High value, but deferrable. For each: what we lose by deferring, and what to watch for in user feedback that signals we should prioritize it.
+
+TIER 3 — Cut for now
+Low signal-to-cost ratio, premature optimization, or "nice to have" that doesn't generate learning. For each: one sentence on why it's cut.
+
+Final output: a Tier 1 feature list with total estimated build days. If Tier 1 still exceeds the timeline, flag it explicitly and suggest what to cut from Tier 1 to make it fit.
+
+Be direct. An honest scope cut is worth more than an optimistic MVP that ships 6 weeks late.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — Exit Criteria</div>
+          <ul class="gate-checklist">
+            <li>PRD reviewed and signed off by all team members and stakeholders</li>
+            <li>Every MVP story has at least one testable acceptance criterion</li>
+            <li>NFRs defined — no "TBD" on security or performance targets</li>
+            <li>Out-of-scope list explicitly written and agreed</li>
+            <li>All open questions assigned an owner with a resolution deadline</li>
+            <li>No stories with XL complexity remain un-broken-down</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 3: ARCHITECTURE & DESIGN
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-3" id="phase-3">
+      <div class="phase-header">
+        <div class="phase-badge">3</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 03 · Architecture &amp; Design</div>
+          <h2 class="phase-title">Architecture &amp; Design</h2>
+          <p class="phase-desc">Define the system before building it. The goal is to make key structural decisions explicit — recorded, reasoned, and reversible where possible. Architecture work done here prevents the most expensive rework a small team can face.</p>
+        </div>
+        <div class="phase-number-bg">3</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>Tech stack finalized</li>
+            <li>System design and component diagram</li>
+            <li>Architecture Decision Records (ADRs)</li>
+            <li>Data model and API contract design</li>
+            <li>Security and threat model review</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">ADR drafting</span>
+            <span class="badge">Architecture review</span>
+            <span class="badge">Data model design</span>
+            <span class="badge">API contract design</span>
+            <span class="badge">Threat modeling</span>
+            <span class="badge">Stack comparison</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>System architecture doc + diagram</li>
+            <li>ADRs for key decisions</li>
+            <li>Data model (ER diagram + annotations)</li>
+            <li>API contract spec (OpenAPI or markdown)</li>
+            <li>Threat model notes</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;Write ADRs for decisions that are hard to reverse and have real alternatives. You do not need an ADR for every choice. A wrong ADR is better than no ADR — revisit triggers are part of the format.
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P3.1</span>
+            <span class="prompt-title-text">Architecture Decision Record (ADR)</span>
+            <span class="prompt-use-tag">Any major technical decision</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Help me write an Architecture Decision Record (ADR) for the following technical decision.
+
+Decision context: [DESCRIBE THE DECISION — e.g., "choosing a primary database," "API layer: REST vs. GraphQL," "auth provider selection," "background job processing approach"]
+
+Product context:
+- SaaS web app, 2-4 person team
+- GitHub CI/CD, cloud deployment (AWS/Azure/GCP)
+- Expected load: [DESCRIBE]
+- Data sensitivity: [DESCRIBE]
+- Team familiarity: [what the team already knows well]
+
+Options under consideration: [LIST 2-4 OPTIONS]
+
+Write the ADR in this format:
+
+---
+ADR-[NNN]: [Short title]
+Status: Proposed
+Date: [TODAY]
+
+Context
+[What is the situation forcing this decision? What constraints, forces, or requirements are at play? What would happen if we made no decision and deferred?]
+
+Decision Drivers
+[4-6 criteria we're optimizing for, ranked by importance. Be specific — not "scalability" but "must support 10,000 concurrent connections with a 2-person ops team."]
+
+Options Considered
+For each option:
+- Name
+- Description (1 paragraph)
+- Pros (specific to our context and decision drivers)
+- Cons (honest — include cost, complexity, and operational burden)
+- Rough implementation effort estimate
+
+Decision
+[Which option, and the primary reason. 2-3 sentences max.]
+
+Rationale
+[Explain the tradeoffs accepted and why the chosen option wins on the criteria that matter most for our stage.]
+
+Consequences
+[What gets easier? What gets harder? What are we explicitly accepting as a tradeoff?]
+
+Revisit Trigger
+[Under what specific circumstances — load threshold, team growth, feature requirements — should we revisit this decision?]
+---</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P3.2</span>
+            <span class="prompt-title-text">System Architecture Review</span>
+            <span class="prompt-use-tag">After first architecture draft</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Review this system architecture for a SaaS web application. I want to find gaps before we start building.
+
+Architecture description:
+[DESCRIBE YOUR SYSTEM IN DETAIL:
+- Frontend: framework, hosting, CDN approach
+- API layer: framework, auth method, request routing
+- Backend services: what they do, how they communicate
+- Database(s): type, hosting, backup approach
+- Background jobs: queue, worker setup
+- File storage: approach and access pattern
+- External integrations: third-party APIs or services
+- Deployment: cloud provider, containers or serverless, environments]
+
+Team: 2-4 developers, full-stack
+
+Review against these dimensions — skip anything that is genuinely low-risk for our stage:
+
+1. Single points of failure — what happens when component X is unavailable? Which components lack failover or graceful degradation?
+
+2. Data consistency — where could we have race conditions, stale reads, or write conflicts? Identify any operations that need to be atomic but currently aren't.
+
+3. Security perimeter — trace the path of a single user request. Where does untrusted input enter? Is it validated at every boundary? Are there any implicit trust assumptions between internal services?
+
+4. Scalability bottlenecks — which components will degrade first under load? At what order-of-magnitude of users? Is the cost profile linear or does something get expensive suddenly?
+
+5. Operational complexity — what does an incident look like at 2am? Can we tell what's wrong from logs and metrics alone? What manual interventions are required for common operations (deploy, rollback, schema migration)?
+
+6. Developer experience — can a new engineer run this locally in under 30 minutes? Are there any environment-specific secrets that block local development?
+
+For each issue: describe the risk, severity (Critical / High / Medium / Low), and recommended mitigation. Focus on issues that would be significantly harder to fix after the codebase grows.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P3.3</span>
+            <span class="prompt-title-text">Data Model Design</span>
+            <span class="prompt-use-tag">Before any schema or migration work</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Design a data model for the following application. I'll implement it in PostgreSQL.
+
+Product description: [DESCRIBE]
+Core entities I've identified: [LIST THEM]
+Key user workflows that touch data: [DESCRIBE THE 3-5 MOST IMPORTANT DATA OPERATIONS]
+Expected query patterns: [e.g., "mostly read-heavy," "users query their own data by date range," "we need full-text search on X"]
+
+Produce:
+
+1. Entity definitions — for each entity:
+   - Name and purpose
+   - Fields: name, data type (PostgreSQL types), constraints (NOT NULL, UNIQUE, default values)
+   - Primary key approach (UUID vs. serial integer — recommend and justify)
+   - Relationships to other entities (FK references)
+
+2. Relationship summary — describe the complete ER model in plain text:
+   "User has many Projects, Project belongs to exactly one User, Project has many Tasks..."
+
+3. Indexing recommendations — which fields to index and why. Include composite index recommendations for common query patterns. Flag any fields that look like they'll be used in WHERE clauses that lack indexes.
+
+4. Multi-tenancy design — how does this model isolate data between customers?
+   Recommend: row-level (tenant_id column), schema-level, or database-level — with reasoning for our scale and team size.
+
+5. Soft delete vs. hard delete — recommendation per entity. Consider: audit requirements, referential integrity, recovery needs.
+
+6. Audit fields — which entities need created_at, updated_at, created_by, updated_by? Are there entities where we need a full audit log (separate events/history table)?
+
+7. Migration risk assessment — which entities are most likely to change as we learn from users? Flag the top 3 and describe what kinds of changes to expect so we can design for extensibility now.
+
+8. Potential schema pitfalls — based on the design, flag anything that looks like it will require a painful migration after data accumulates (e.g., adding a NOT NULL column, splitting a table, changing a FK cascade behavior).</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P3.4</span>
+            <span class="prompt-title-text">REST API Contract Design</span>
+            <span class="prompt-use-tag">Before API implementation begins</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Design the REST API contract for the following feature set.
+
+Features to support: [DESCRIBE THE USER STORIES OR FEATURES THAT REQUIRE API ENDPOINTS]
+Auth model: [e.g., JWT Bearer tokens via OIDC, API key for service-to-service]
+API versioning strategy: [e.g., /api/v1/ prefix]
+Response envelope: [e.g., consistent { data, error, meta } wrapper or flat responses]
+
+For each endpoint, define:
+- HTTP method + path
+- Description (what this endpoint does and when to call it)
+- Path parameters (name, type, description)
+- Query parameters (name, type, required/optional, default, description)
+- Request body schema (JSON — field name, type, required/optional, validation constraints, example)
+- Success response (status code + body schema with example)
+- Error responses (status code + error schema for each failure case — not just 400/500 generics)
+- Auth requirement (authenticated / public / specific role/scope)
+- Idempotency (is this endpoint idempotent? if not, what makes it safe to retry?)
+
+After defining all endpoints, also address:
+
+1. Pagination — which endpoints return lists? Specify the pagination strategy:
+   - Cursor-based (recommended for real-time data) or offset-based (simpler but inconsistent under inserts)?
+   - Request params and response envelope for pagination metadata
+
+2. Standard error envelope — define a single error response schema to use consistently:
+   { error: { code, message, details?, requestId? } }
+
+3. Rate limiting headers — which endpoints need rate limiting? Specify the X-RateLimit headers to return.
+
+4. Async operations — any endpoints that trigger long-running work? Specify whether to use polling (return a job ID), webhooks, or SSE.
+
+5. Backwards compatibility rules — what's our policy for breaking vs. non-breaking API changes? What triggers a version bump to /v2/?
+
+Output as structured markdown. Include a one-line curl example for each non-trivial endpoint.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — Exit Criteria</div>
+          <ul class="gate-checklist">
+            <li>ADRs written for: database, API layer, auth approach, and any other hard-to-reverse decision</li>
+            <li>System architecture reviewed by at least two team members; no Critical-severity issues unresolved</li>
+            <li>Data model reviewed; all entities have defined indexing and multi-tenancy strategy</li>
+            <li>API contract defined for all MVP endpoints; error envelope standardized</li>
+            <li>Threat model reviewed; OWASP Top 10 gaps addressed or explicitly accepted</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 4: DEVELOPMENT
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-4" id="phase-4">
+      <div class="phase-header">
+        <div class="phase-badge">4</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 04 · Development</div>
+          <h2 class="phase-title">Development</h2>
+          <p class="phase-desc">The agent is your pair programmer, reviewer, and documentation writer — not your replacement. Every AI-generated code block gets the same human review as human-written code. The branching strategy is the communication protocol of the team.</p>
+        </div>
+        <div class="phase-number-bg">4</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>Feature branches from main</li>
+            <li>Stories implemented with agent assistance</li>
+            <li>Code reviewed on every PR</li>
+            <li>Documentation written alongside code</li>
+            <li>Agent-assisted debugging for blockers</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">Implementation planning</span>
+            <span class="badge">Code generation</span>
+            <span class="badge">Code review</span>
+            <span class="badge">Debugging</span>
+            <span class="badge">Refactoring</span>
+            <span class="badge">Inline documentation</span>
+            <span class="badge">Commit message writing</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>Merged, reviewed feature branches</li>
+            <li>Inline code documentation</li>
+            <li>Module-level README sections</li>
+            <li>Clean, attributed commit history</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;On a 2-person team, a full async PR review cycle may be overkill for small changes. Establish a size threshold — e.g., PRs under 50 lines with passing CI can merge with async approval; anything larger requires synchronous review. Write this rule down and apply it consistently.
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P4.1</span>
+            <span class="prompt-title-text">Feature Implementation Plan</span>
+            <span class="prompt-use-tag">Before writing any code for a story</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">I'm implementing this user story. Before I write any code, help me plan the implementation.
+
+User story: [PASTE THE STORY]
+Acceptance criteria: [PASTE ALL GIVEN/WHEN/THEN CRITERIA]
+
+Tech stack:
+- Frontend: [e.g., React + TypeScript, React Query for data fetching, Tailwind for styles]
+- API: [e.g., Node.js + Express + Zod for validation]
+- Database: [e.g., PostgreSQL via Prisma ORM]
+- Auth: [e.g., JWT via Auth0 / Supabase Auth]
+- Deployment: [e.g., AWS ECS via GitHub Actions]
+
+Existing patterns to follow: [DESCRIBE ANY CONVENTIONS — e.g., "repository pattern for DB access," "all mutations go through service layer," "React components use compound component pattern," "error handling uses a Result type"]
+
+Produce:
+
+1. Implementation steps — ordered list from data layer to API to UI. Be specific about what changes at each layer and in what sequence. Include "write tests" as explicit steps, not an afterthought.
+
+2. Files to create or modify — for every file: path, what changes, why. Group by layer (DB migration → model/repository → service → API route → API test → frontend component → component test).
+
+3. Database changes needed — new tables, columns, indexes, or migrations. Write the migration in SQL or Prisma schema syntax.
+
+4. API changes needed — new or modified endpoints. Specify method, path, request/response schema changes.
+
+5. Edge cases to handle — list every case that must not slip through:
+   - Permission check (who can do this? what happens if they can't?)
+   - Empty / null / zero state
+   - Duplicate or idempotency case
+   - Failure of a downstream dependency
+
+6. What NOT to do — common over-engineering traps or out-of-scope additions to avoid.
+
+Do not write implementation code yet. I want to review this plan first.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P4.2</span>
+            <span class="prompt-title-text">Substantive Code Review</span>
+            <span class="prompt-use-tag">On every PR — before human review</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Review this code for correctness, security, performance, and maintainability. Do not comment on style or formatting — that's handled by our linter.
+
+Code diff / files:
+[PASTE CODE OR DESCRIBE THE PR]
+
+Context:
+- What this code does: [DESCRIBE]
+- Which user story it implements: [PASTE STORY + ACCEPTANCE CRITERIA]
+- Stack: [TypeScript / Node.js / React / PostgreSQL / etc.]
+- Where this lives in the system: [e.g., API route handler, React component, database service layer]
+
+Review for:
+
+1. Correctness
+   - Does it fulfill all the acceptance criteria?
+   - Are there logic errors, off-by-one errors, or incorrect conditional branches?
+   - Are there cases in the acceptance criteria that this code doesn't handle?
+
+2. Security
+   - SQL injection, XSS, or injection risks (even with parameterized queries, look for dynamic query construction)
+   - Authentication bypass — is auth checked before the operation, or after data access?
+   - Authorization — is the current user's permission to access THIS specific resource verified (not just "are they logged in")?
+   - Sensitive data in logs, error messages, or API responses
+   - Secrets or credentials in code or config files
+
+3. Error handling
+   - Are errors caught at the right level?
+   - Do uncaught promise rejections exist?
+   - Do errors expose internal stack traces to API consumers?
+   - Is every error logged with enough context to diagnose in production?
+
+4. Performance
+   - N+1 query patterns (loop containing a DB call)
+   - Unbounded queries (no LIMIT on list queries)
+   - Missing async/await causing synchronous blocking
+   - Unnecessary data fetching (SELECT * where only 2 columns are used)
+
+5. Testability
+   - What's difficult to unit test in the current structure?
+   - Are side effects (DB writes, API calls, emails) injectable/mockable?
+
+Format: For each issue — file:line, severity (Critical/High/Medium/Low), description of the problem, and the specific fix or refactoring needed.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P4.3</span>
+            <span class="prompt-title-text">Systematic Debugging</span>
+            <span class="prompt-use-tag">When stuck on a bug for &gt;30 minutes</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">I have a bug I can't track down. Help me diagnose it systematically.
+
+Symptom: [DESCRIBE EXACTLY WHAT IS HAPPENING — include the exact error message, unexpected output, or behavior]
+
+Reproduction steps:
+1. [STEP 1]
+2. [STEP 2]
+3. [WHAT HAPPENS VS. WHAT SHOULD HAPPEN]
+
+Is this reproducible consistently, or intermittently? [CONSISTENT / INTERMITTENT — if intermittent, describe the pattern]
+
+Stack: [FULL TECH STACK]
+Environment where it occurs: [local / staging / production / all]
+
+Relevant code:
+[PASTE THE CODE MOST LIKELY INVOLVED — the handler, function, or component]
+
+Logs / error output:
+[PASTE THE FULL ERROR, STACK TRACE, OR LOG LINES — do not summarize, paste the raw output]
+
+Recent changes: [Any code changes, deploys, dependency updates, or config changes in the last 24-48 hours]
+
+Approach this systematically:
+
+1. Root cause hypotheses — list the most likely root causes in order of probability given the symptom, code, and logs. For each: one sentence explaining why it would produce this symptom.
+
+2. Diagnostic steps — for the top 2-3 hypotheses, what is the minimum change (a log statement, a null check, a test case) that would confirm or definitively rule out each hypothesis? Give me these in order — binary search the problem space.
+
+3. Isolation strategy — if we can't reproduce it reliably, how do we instrument the code to capture state when it next occurs in production?
+
+4. The fix — once we identify the root cause, what is the correct fix? Is this a local fix or does the same bug pattern exist elsewhere in the codebase?
+
+5. Prevention — what would have caught this earlier? A test, a type, a lint rule, or a code review check?</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P4.4</span>
+            <span class="prompt-title-text">Code Documentation Generation</span>
+            <span class="prompt-use-tag">After feature is merged — before sprint end</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Generate developer documentation for the following code. Audience: other engineers on the team, not end users.
+
+Code:
+[PASTE THE MODULE, FILE, OR FUNCTION]
+
+Produce:
+
+1. File/module-level docstring — what this module does, what it exports, and any important design decisions embedded in it. Note what it is NOT responsible for (boundaries matter).
+
+2. Function/method documentation — for each exported or non-trivial internal function:
+   - What it does (behavior, not implementation)
+   - Parameters: name, type, description, whether optional
+   - Return value: type and meaning
+   - Throws / rejects: under what conditions, and with what error type
+   - Side effects: does it write to DB, send emails, mutate external state?
+   - Example usage for any function that is non-obvious or has non-trivial input shapes
+
+3. Inline comments — identify logic that is non-obvious and write concise inline comments explaining the "why," not the "what." Good candidates:
+   - Business rules embedded in code ("we check X before Y because...")
+   - Performance optimizations ("we batch here because individual queries cause N+1...")
+   - Workarounds for external API quirks
+   - Security-sensitive decisions ("we intentionally return the same error for both cases to prevent user enumeration")
+
+4. README contribution — if this is a new module or subsystem, write a 3-5 sentence section explaining: what it does, when to use it, and one common mistake to avoid.
+
+Rules:
+- Do NOT document trivial code (getters, simple assignments, boilerplate)
+- Do NOT restate what the code obviously does — only document the non-obvious
+- Keep comments tight — a 2-line comment that's always accurate beats a 10-line comment that goes stale</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — PR Merge Criteria</div>
+          <ul class="gate-checklist">
+            <li>All acceptance criteria from the story are demonstrably met</li>
+            <li>At least one team member has reviewed the PR synchronously or async</li>
+            <li>No Critical or High-severity review issues unresolved</li>
+            <li>CI is green: lint, type-check, unit tests, integration tests all pass</li>
+            <li>No secrets, credentials, or debug code committed</li>
+            <li>Non-obvious logic has inline comments; new modules have docstrings</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 5: TESTING & QA
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-5" id="phase-5">
+      <div class="phase-header">
+        <div class="phase-badge">5</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 05 · Testing &amp; QA</div>
+          <h2 class="phase-title">Testing &amp; QA</h2>
+          <p class="phase-desc">Tests are the machine-readable specification of your product's behavior. AI agents dramatically reduce the cost of writing tests — which removes the excuse not to write them. For a small team, a well-instrumented test suite is the most leveraged investment you can make.</p>
+        </div>
+        <div class="phase-number-bg">5</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>Unit tests written per function</li>
+            <li>Integration tests per API endpoint</li>
+            <li>E2E tests for critical user flows</li>
+            <li>Coverage targets enforced in CI</li>
+            <li>Flaky tests triaged and fixed</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">Unit test generation</span>
+            <span class="badge">Integration test generation</span>
+            <span class="badge">E2E scenario writing</span>
+            <span class="badge">Coverage gap analysis</span>
+            <span class="badge">Test data setup</span>
+            <span class="badge">Flaky test diagnosis</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>Unit + integration test suite (Jest)</li>
+            <li>E2E smoke tests (Playwright)</li>
+            <li>Coverage report hitting threshold</li>
+            <li>CI-enforced quality gates</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;Coverage percentage is a floor, not a goal. 80% coverage on business-critical paths beats 95% coverage padded with trivial getter tests. Define coverage thresholds per module tier: higher for core business logic, lower for UI scaffolding and config.
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P5.1</span>
+            <span class="prompt-title-text">Comprehensive Unit &amp; Integration Test Suite</span>
+            <span class="prompt-use-tag">For any function, service, or API route</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Generate a comprehensive test suite for the following code.
+
+Code to test:
+[PASTE THE FUNCTION, SERVICE, OR API ROUTE HANDLER]
+
+Testing framework: [Jest + Supertest for API / Jest + React Testing Library for components]
+Mocking approach: [Jest mocks / MSW / test doubles — describe what you use]
+Stack: [TypeScript / Node.js / React / PostgreSQL]
+
+Write tests covering every meaningful behavioral case. Organize them as:
+
+UNIT TESTS (pure logic, external deps mocked):
+
+1. Happy path — all valid inputs producing the expected output. Be specific about input values and the exact expected output, don't just assert "it returns something."
+
+2. Input validation — for each required field: missing, null, wrong type, empty string, too long, too short, boundary values. For each: assert the specific error code or message returned.
+
+3. Business rule edge cases — test the conditions that encode domain logic:
+   - If there's a conditional branch, test both paths explicitly
+   - If there's a calculation, test zero, negative, decimal, and maximum values
+   - If there's a permission check, test permitted and non-permitted roles
+
+4. Error propagation — when a dependency (DB, external API) throws or rejects, does this function: catch and re-throw as a domain error, return a null/undefined, or bubble the raw error? Test the behavior you want.
+
+INTEGRATION TESTS (for API routes — real DB, external deps mocked at network boundary):
+
+5. Full request → response cycle for happy path
+6. Auth failures — no token, expired token, insufficient role
+7. Correct HTTP status codes for every error case
+8. Response body shape — does it match the API contract?
+
+For each test, use descriptive names:
+"should [expected behavior] when [condition]"
+
+After the test suite, list any parts of the code that are difficult to test in the current structure and recommend the specific refactoring that would fix it.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P5.2</span>
+            <span class="prompt-title-text">Playwright E2E Test Suite</span>
+            <span class="prompt-use-tag">For user-facing workflows</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Write Playwright end-to-end tests for the following user workflow.
+
+Workflow to test: [DESCRIBE THE FULL USER JOURNEY — e.g., "user signs up, confirms email, creates their first project, adds a collaborator, and the collaborator accepts the invite"]
+
+Application: [DESCRIBE THE APP AND ITS TECH STACK]
+Test environment: [local with seeded DB / dedicated staging environment]
+Auth approach: [e.g., we use a test user seeded via API before each test / Playwright auth state saved in a file]
+
+For each test scenario:
+
+1. Test name — use the format: "User can [complete action] when [precondition]"
+
+2. Preconditions — exact state the app must be in. Include:
+   - Database state (seeded data, existing users, records)
+   - Auth state (logged in as which user role)
+   - Any feature flags or environment config required
+
+3. Test steps — exact Playwright interactions:
+   - page.goto() with full path
+   - page.getByRole() / getByLabel() / getByTestId() — prefer accessible selectors
+   - page.fill(), page.click(), page.selectOption() — with exact values
+   - page.waitForURL() or expect(page).toHaveURL() after navigations
+
+4. Assertions — at the end of the test, assert:
+   - Final URL
+   - Visible text or elements that confirm success
+   - Any API calls that should have been made (use page.route() or network interception)
+   - Database state changes (if testable via UI or API)
+
+5. Teardown — what to clean up after the test (delete created records, reset state)
+
+Also provide:
+
+SMOKE TEST SUITE — identify the 3-5 most critical flows that must never break before a production deploy. These should run in under 2 minutes.
+
+FLAKY TEST PREVENTION — for any step involving animations, async loading, or timing:
+- Use expect(locator).toBeVisible() with timeout instead of page.waitForTimeout()
+- Use page.waitForResponse() for API-dependent assertions
+- Note any steps that are inherently non-deterministic and how to stabilize them</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P5.3</span>
+            <span class="prompt-title-text">Coverage Gap Analysis</span>
+            <span class="prompt-use-tag">Sprint retrospective / before release</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Analyze our test coverage and tell me what to test next — prioritized by risk, not by line count.
+
+Coverage report:
+[PASTE JEST COVERAGE OUTPUT OR DESCRIBE: overall %, and per-file or per-module breakdown]
+
+Test inventory:
+- Unit tests: [X tests across Y files]
+- Integration tests: [X API route tests]
+- E2E tests: [X Playwright scenarios]
+
+Codebase overview:
+[DESCRIBE THE MAIN MODULES AND THEIR BUSINESS CRITICALITY — e.g., "auth module handles all login and permission logic," "billing module handles payment processing," "notifications module sends emails"]
+
+Analyze:
+
+1. High-risk uncovered paths — which uncovered lines or branches represent the most dangerous gaps?
+   Focus on: business-critical operations, auth/permission logic, payment flows, data mutation paths.
+   Ignore: simple getters, config files, UI scaffolding, logging calls.
+
+2. False coverage — do we have tests that inflate coverage without actually testing behavior?
+   Symptoms: tests that only call functions without asserting on output, tests that mock away all the interesting behavior, tests that only cover the success path of functions with 5 branching conditions.
+
+3. Integration layer gaps — even if unit coverage is high, are there integration tests missing for cases where two correct units interact incorrectly? (e.g., service layer assumes DB returns [] for empty, but DB actually returns null)
+
+4. E2E coverage gaps — which critical user workflows have no E2E coverage? Identify the flows where a regression would be found by a user before our test suite.
+
+5. Recommended next 8 tests — in priority order:
+   Test name | Type (unit/integration/E2E) | What it covers | Why it's high priority
+
+Skip any test that would duplicate existing coverage or test trivial logic.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P5.4</span>
+            <span class="prompt-title-text">Test Data &amp; Fixture Strategy</span>
+            <span class="prompt-use-tag">When setting up test infrastructure</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Design a test data and fixture strategy for our test suite.
+
+Application: [DESCRIBE]
+Database: PostgreSQL
+Test framework: Jest (unit/integration), Playwright (E2E)
+Data model summary: [DESCRIBE KEY ENTITIES AND RELATIONSHIPS]
+
+We need a strategy that:
+- Keeps tests isolated (test A shouldn't break because test B ran first)
+- Is fast (seeding can't add 30 seconds per test file)
+- Covers multiple user roles and permission scenarios
+- Works in both local dev and CI environments
+
+Design:
+
+1. Database isolation strategy for integration tests
+   Options: separate test DB per run / transaction rollback per test / table truncation between tests
+   Recommend one and explain the tradeoff for our scale.
+
+2. Seed data architecture
+   - What "baseline" data should always exist (system roles, plan tiers, config records)?
+   - What should be created per-test (user, org, resources)?
+   - Design a factory/builder pattern for creating test entities:
+     Show a TypeScript example of a createUser() and createProject() factory function that supports override parameters.
+
+3. Role and permission coverage matrix
+   - List the user roles in our system
+   - For each role, what scenarios must we test? (what they CAN do, what they CANNOT do)
+   - How do we efficiently set up each role without duplicating setup code?
+
+4. E2E test data
+   - Should E2E tests use the same DB as integration tests or a dedicated environment?
+   - How do we seed E2E state: API calls before test, DB seed script, Playwright fixtures?
+   - How do we clean up after E2E tests without slowing down the suite?
+
+5. Sensitive data in tests
+   - How do we handle PII in test data? (fake data generators like @faker-js/faker)
+   - What goes in .env.test vs. committed test config?</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — Exit Criteria</div>
+          <ul class="gate-checklist">
+            <li>Unit test coverage meets defined threshold for business-critical modules</li>
+            <li>Every API endpoint has at minimum: happy path, auth failure, and validation error integration tests</li>
+            <li>Smoke test suite exists and covers the 3-5 most critical user workflows</li>
+            <li>CI enforces coverage thresholds — build fails below the floor</li>
+            <li>No known flaky tests in the suite (flaky = passes on retry = not a real green)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════
+         PHASE 6: DEPLOY & OPERATIONS
+    ══════════════════════════════════════════════════ -->
+    <section class="phase phase-6" id="phase-6">
+      <div class="phase-header">
+        <div class="phase-badge">6</div>
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 06 · Deploy &amp; Operations</div>
+          <h2 class="phase-title">Deploy &amp; Operations</h2>
+          <p class="phase-desc">Deployment should be boring. An incident should be diagnosable. A rollback should take under 5 minutes. These are engineering outcomes, not aspirations — and they require intentional design before the first production deploy, not after the first production incident.</p>
+        </div>
+        <div class="phase-number-bg">6</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">What Happens</div>
+          <ul class="info-card-list">
+            <li>CI/CD pipeline built and tested</li>
+            <li>Infrastructure provisioned (IaC)</li>
+            <li>Monitoring and alerting configured</li>
+            <li>Deployment runbook written</li>
+            <li>Incident response process defined</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Agent Integration Points</div>
+          <div class="badge-list">
+            <span class="badge">GitHub Actions YAML</span>
+            <span class="badge">IaC generation</span>
+            <span class="badge">Runbook writing</span>
+            <span class="badge">Incident triage</span>
+            <span class="badge">Monitoring config</span>
+            <span class="badge">Postmortem drafting</span>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Exit Artifacts</div>
+          <ul class="info-card-list">
+            <li>GitHub Actions CI/CD pipeline</li>
+            <li>IaC configuration (Terraform/CDK)</li>
+            <li>Deployment runbook</li>
+            <li>Monitoring dashboard + alert rules</li>
+            <li>Incident response playbook</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex-callout">
+        <strong>Flex point:</strong>&nbsp;For a first deployment to a handful of internal users, a manual deploy with a written checklist is acceptable. Automate ruthlessly once deployment frequency justifies it — aim for "automate it before the 5th manual execution."
+      </div>
+
+      <div class="prompt-library-header">Prompt Library</div>
+      <div class="prompt-cards">
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P6.1</span>
+            <span class="prompt-title-text">GitHub Actions CI/CD Pipeline</span>
+            <span class="prompt-use-tag">Initial pipeline setup</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Generate a complete, production-ready GitHub Actions CI/CD pipeline for this application.
+
+Stack:
+- Frontend: [e.g., React + TypeScript, built with Vite]
+- Backend/API: [e.g., Node.js + Express + TypeScript]
+- Database: PostgreSQL
+- Containerization: [Docker / not containerized]
+- Cloud target: [AWS ECS / Azure App Service / Google Cloud Run — specify]
+- Container registry: [ECR / ACR / Artifact Registry / GHCR]
+
+Environments: development (feature branches), staging (main branch), production (release tags)
+
+Deployment strategy: [rolling / blue-green / specify]
+
+Generate FOUR workflow files:
+
+1. ci.yml — triggered on every push and PR to any branch
+   Steps: checkout → setup Node (cache node_modules) → install deps → lint → type-check → unit tests → integration tests (with a test DB service container) → build → upload build artifact
+   Post results as a PR status check. Fail fast on lint before running tests.
+
+2. deploy-staging.yml — triggered on merge to main
+   Steps: run full CI suite → build Docker image → tag with commit SHA → push to container registry → deploy to staging environment → run smoke tests (Playwright against staging URL) → post result to Slack/Teams → on failure: notify and halt (do not auto-rollback staging)
+
+3. deploy-production.yml — triggered on release tag (v*.*.*)
+   Steps: require manual approval via GitHub Environment protection rule → deploy the same image SHA that passed staging (do not rebuild) → run smoke tests against production → on success: create GitHub deployment record → on failure: auto-trigger rollback job and page on-call
+
+4. rollback.yml — manually triggered workflow with inputs: environment (staging/production) and target image tag
+   Steps: redeploy the specified previous image tag → run smoke tests → report result
+
+Required secrets — list every GitHub secret needed, with a description of what it is and how to generate it.
+
+Caching strategy — specify where to cache: node_modules (use actions/cache with package-lock.json hash), Docker layers (use buildx cache).
+
+Important constraints:
+- Never log secrets (use ::add-mask:: for any dynamic secret values)
+- Production deploy must require a named approver in GitHub Environments
+- All jobs should have explicit timeout-minutes to prevent runaway billing</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P6.2</span>
+            <span class="prompt-title-text">Infrastructure as Code</span>
+            <span class="prompt-use-tag">Before first cloud deployment</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Generate infrastructure-as-code for deploying this SaaS application to the cloud.
+
+Application components:
+- Frontend: [static SPA / SSR — describe]
+- API: [containerized Node.js / serverless functions — describe]
+- Background workers: [yes/no — describe if yes]
+- Database: PostgreSQL (managed)
+- File storage: object storage for user uploads
+
+Cloud provider: [AWS / Azure / GCP]
+IaC tool: [Terraform / AWS CDK (TypeScript) / Azure Bicep / Pulumi]
+Scale target: startup stage — optimize for low cost and low ops overhead at &lt;1,000 users. Design to scale to 50,000 users without an architectural rewrite.
+
+Generate configurations for:
+
+1. Compute
+   [AWS: ECS Fargate / Azure: Container Apps / GCP: Cloud Run]
+   - Service definition with CPU/memory appropriate for startup scale
+   - Autoscaling config: min 1 instance, scale up trigger (CPU % or request count), max instances
+   - Health check path and threshold
+   - Environment variables injected from secrets manager (not hardcoded)
+
+2. Managed Database
+   [AWS: RDS PostgreSQL / Azure Database for PostgreSQL / Cloud SQL]
+   - Instance size appropriate for startup (right-size for cost, not max)
+   - Automated backups enabled (daily, 7-day retention minimum)
+   - Private subnet placement (no public internet access)
+   - Connection pooling recommendation (PgBouncer or serverless proxy)
+
+3. Networking
+   - VPC/VNET with public and private subnet separation
+   - Public subnet: load balancer only
+   - Private subnet: compute, database
+   - Security groups: allow 443 from internet → LB, allow app port from LB → compute, allow 5432 from compute → DB only
+
+4. Load Balancer
+   - HTTPS listener with SSL certificate (ACM / managed certificate)
+   - HTTP → HTTPS redirect
+   - Health check configuration
+
+5. Object Storage
+   - Private bucket (no public access by default)
+   - Signed URL pattern for user file access (include example policy)
+   - Lifecycle rule: move objects older than 90 days to cheaper storage tier
+
+6. Secrets Management
+   [AWS Secrets Manager / Azure Key Vault / GCP Secret Manager]
+   - Store: DB connection string, API keys, JWT secret
+   - IAM policy: compute role has read access to its specific secrets only (least privilege)
+
+7. Basic Monitoring Alarms
+   - CPU utilization &gt; 80% for 5 minutes
+   - HTTP 5xx error rate &gt; 1% for 5 minutes
+   - API latency (p99) &gt; 2 seconds for 5 minutes
+   - Database connection count &gt; 80% of max
+   - Alarm action: SNS topic → email notification (or Slack via Lambda)
+
+Add comments to all non-obvious configuration choices. Flag any setting that should be revisited when scaling past 10,000 users.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P6.3</span>
+            <span class="prompt-title-text">Incident Triage</span>
+            <span class="prompt-use-tag">Active production incident</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Help me triage a production incident. Work quickly — this is live.
+
+Symptom: [DESCRIBE EXACTLY — error rates, latency spike, specific error messages, complete outage, wrong data]
+
+User impact: [ALL users / subset — describe which users or actions are affected]
+Started: approximately [TIME OR "unknown"]
+Ongoing: [YES / resolved at TIME]
+
+Recent changes (last 24 hours):
+- Deploys: [list any, or "none"]
+- Config changes: [list any]
+- Infrastructure changes: [list any]
+- Dependency updates: [list any]
+
+Relevant logs (paste raw — don't summarize):
+[PASTE LOG LINES]
+
+Metrics anomalies:
+[DESCRIBE what's abnormal in dashboards — CPU, memory, DB connections, error rate, latency, queue depth, anything unusual]
+
+Current status of key components:
+- API: [healthy / degraded / down]
+- Database: [healthy / degraded / connection errors / slow queries]
+- External dependencies: [healthy / issues]
+
+Triage this systematically:
+
+1. Most likely root cause — given all signals, what's the most probable cause? State your confidence level and what makes you uncertain.
+
+2. Next 3 diagnostic steps — in order of speed and signal strength. For each: what you're looking for and what it would confirm.
+
+3. Fastest mitigation path — what can we do RIGHT NOW to stop user impact, even if it's not the proper fix? (Rollback, feature flag off, scale up, rate limit, redirect traffic, etc.)
+
+4. Blast radius check — who else might be affected that we haven't identified yet? (Other services, downstream integrations, specific user segments, async jobs)
+
+5. Internal status update — 3-4 sentence update for the team right now. Non-technical, factual, no speculation. Just: what we know is broken, who is affected, and what we're doing.
+
+Think out loud. Reasoning matters more than a confident wrong answer.</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-card-header" onclick="togglePrompt(this.parentElement)">
+            <span class="prompt-index">P6.4</span>
+            <span class="prompt-title-text">Deployment Runbook</span>
+            <span class="prompt-use-tag">Before first production deploy</span>
+            <span class="prompt-chevron">▾</span>
+          </div>
+          <div class="prompt-body">
+            <pre class="prompt-text">Write a deployment runbook for this application. This document must be executable by an engineer who has never deployed this app, under pressure, at 11pm.
+
+Application: [DESCRIBE]
+Deployment mechanism: [GitHub Actions workflow triggered by release tag / manual deploy — describe]
+Cloud provider: [AWS / Azure / GCP]
+Deployment strategy: [rolling / blue-green — describe]
+Database: PostgreSQL — migrations run [automatically on deploy / manually before deploy — specify]
+Rollback strategy: [redeploy previous image / blue-green swap / describe]
+
+Write the runbook with:
+
+1. PRE-DEPLOYMENT CHECKLIST
+   - Verify all CI checks are green on the commit being deployed
+   - Confirm the image was promoted from staging (not a fresh build)
+   - Confirm staging smoke tests passed
+   - Check for any pending database migrations — are they backwards compatible?
+   - Check current production error rate and latency baseline (record it — you'll need it)
+   - Confirm rollback target: what's the previous stable image tag?
+   - Notify: who needs to know this deploy is happening?
+
+2. DEPLOYMENT STEPS
+   Exact steps with commands or GitHub Actions workflow triggers. No ambiguity. Include the expected state after each step.
+
+3. POST-DEPLOY VERIFICATION (first 10 minutes)
+   - Health check URLs to hit and expected responses
+   - Which smoke tests to run and how to run them
+   - Key metrics to watch: error rate, latency, DB connections (vs. baseline you recorded above)
+   - Specific log lines that confirm the deploy is running correctly
+
+4. ROLLBACK PROCEDURE
+   At what error rate or symptom severity should we rollback? (Define the threshold.)
+   Exact steps to rollback, including:
+   - How to trigger rollback workflow or redeploy previous tag
+   - How to rollback a database migration if needed (which migrations are reversible vs. not?)
+   - Expected time to complete rollback
+   - How to verify rollback succeeded
+
+5. COMMON FAILURE MODES
+   The 4 most likely things to go wrong, with: symptom → diagnosis → fix:
+   - Container fails health check after deploy
+   - Database migration fails mid-deploy
+   - Secrets not available to new container version
+   - Smoke tests fail against production but passed staging
+
+6. POST-DEPLOY (30-60 minutes after)
+   - What to monitor and for how long
+   - When is it safe to declare the deploy stable?
+   - What to communicate to stakeholders when done</pre>
+            <div class="prompt-actions">
+              <button class="copy-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prompt-cards -->
+
+      <div class="quality-gate">
+        <div class="gate-icon">⬡</div>
+        <div>
+          <div class="gate-label">Quality Gate — Production Readiness</div>
+          <ul class="gate-checklist">
+            <li>CI/CD pipeline deployed and tested end-to-end on a staging environment</li>
+            <li>Production deploy requires human approval — no auto-deploy to production</li>
+            <li>Rollback has been tested: time from "decision to rollback" to "rollback complete" measured</li>
+            <li>Monitoring alerts configured and tested (verify they actually fire)</li>
+            <li>Deployment runbook reviewed by at least one engineer who didn't write it</li>
+            <li>Incident response process defined: who gets paged, how, and what they do first</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /main -->
+
+</div><!-- /layout -->
+
+<script>
+  // ─── PROMPT TOGGLE ──────────────────────────────────────
+  function togglePrompt(card) {
+    const isOpen = card.classList.contains('open');
+    card.classList.toggle('open', !isOpen);
+  }
+
+  // ─── COPY BUTTON ────────────────────────────────────────
+  function copyPrompt(btn) {
+    const pre = btn.closest('.prompt-body').querySelector('.prompt-text');
+    const text = pre.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy Prompt';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // ─── ACTIVE NAV HIGHLIGHT ───────────────────────────────
+  const phases = document.querySelectorAll('.phase');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        const num = id.replace('phase-', '');
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.dataset.phase === num);
+        });
+      }
+    });
+  }, { threshold: 0.25 });
+
+  phases.forEach(p => observer.observe(p));
+
+  // ─── PIPELINE DOTS ACTIVE STATE ─────────────────────────
+  const pipDots = document.querySelectorAll('.pip-dot');
+  const phaseObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const num = parseInt(entry.target.id.replace('phase-',''));
+        pipDots.forEach((dot, i) => {
+          dot.style.background = (i + 1 === num) ? 'currentColor' : '';
+          dot.style.transform = (i + 1 === num) ? 'scale(1.2)' : '';
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  phases.forEach(p => phaseObserver.observe(p));
+</script>
+
+</body>
+</html>
